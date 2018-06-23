@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="slib-dist-0.9.4d-all-jar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/slib-dist-0.9.4d-all-jar.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
