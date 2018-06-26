@@ -152,23 +152,10 @@ public class Sim {
         }
 
 
+
         /*
-
-        Setup complet, testing follows
+        mapping between treeNumber and meshTerm (several unique tree numbers can point to the same meshTerm)
          */
-
-        System.out.println("test 1:");
-        TreeNodeMeSH treeNodeMeSH = treeNodesMap.get("A01.378.610.250.300.792.380");
-        System.out.println(treeNodeMeSH);
-        System.out.println("parent:");
-        System.out.println(treeNodeMeSH.getParent());
-        System.out.println("children:");
-        System.out.println(treeNodeMeSH.getChildren());
-
-        System.out.println("test 2:");
-
-
-        //mapping between treeNumber and meshTerm (several uniqe tree numbers can point to the same meshTerm)
 
         HashMap<TreeNodeMeSH,MeshDescriptorCustom> treeNodeToUniqueMeSHID = new HashMap<>();
 
@@ -186,7 +173,13 @@ public class Sim {
         }
 
 
-       ///////////////////////////////////////////////////////////////////
+
+    /*
+
+    IC calculations
+
+      pobability for the ID + the probability for all id:s with a lower treenumber
+     */
 
         System.out.println("calculating information content");
 
@@ -195,32 +188,114 @@ public class Sim {
 
             Set<TreeNodeMeSH> NodSet = meshDescriptorCustomEntry.getValue().getTreeNodeSet();
 
-            List<TreeNodeMeSH> descendents = new ArrayList<>();
+            List<TreeNodeMeSH> descendants = new ArrayList<>();
             for(TreeNodeMeSH treeNodeMeSH1 : NodSet ) {
 
-               descendents.addAll( treeNodeMeSH1.getAllDescendents() );
+               descendants.addAll( treeNodeMeSH1.getAllDescendents() );
 
             }
 
-            Set<MeshDescriptorCustom> setOfMeshTermDescentants = new HashSet<>();
+            Set<MeshDescriptorCustom> setOfMeshTermDescendants = new HashSet<>();
 
-            for(TreeNodeMeSH treeNodeMeSH1 : descendents) setOfMeshTermDescentants.add( treeNodeToUniqueMeSHID.get(treeNodeMeSH1) );
+            for(TreeNodeMeSH treeNodeMeSH1 : descendants) setOfMeshTermDescendants.add( treeNodeToUniqueMeSHID.get(treeNodeMeSH1) );
 
 
-            Iterator<MeshDescriptorCustom> iter = setOfMeshTermDescentants.iterator();
-            double summedProbs = meshDescriptorCustomEntry.getValue().probability;
+            Iterator<MeshDescriptorCustom> iter = setOfMeshTermDescendants.iterator();
+            double summedProbabilities = meshDescriptorCustomEntry.getValue().probability;
 
             while(iter.hasNext()) {
 
-                summedProbs+= iter.next().probability;
+                summedProbabilities+= iter.next().probability;
 
             }
 
-            meshDescriptorCustomEntry.getValue().setInformationContent(  -Math.log(summedProbs) );
+            meshDescriptorCustomEntry.getValue().setInformationContent(  -Math.log(summedProbabilities) );
         }
 
 
+        /*
 
+       Setup indexing structures
+
+         */
+
+        TreeNodeMeshIndex treeNodeMeshIndex = new TreeNodeMeshIndex(treeNodesMap);
+        treeNodeMeshIndex.setTreeNodeToUniqueMeSHTermMap( treeNodeToUniqueMeSHID ); //to access when calculating sim(v,v) and Sim(M,M)
+
+        /*
+
+        Setup complete, testing follows
+
+         */
+
+
+        System.out.println("Running tests:");
+
+        //MeshDescriptorCustom meshDescriptorCustom1 = descriptorsMap.get("D011148"); //Resistance Training
+
+        //MeshDescriptorCustom meshDescriptorCustom2 = descriptorsMap.get("D011323"); //Cool-Down Exercise (higher up)
+
+        /*
+
+        the lowest common ancestor (LCA) of two nodes v and w in a tree  is the lowest (i.e. deepest) node that has both v and w as descendants.
+        We define each node to be a descendant of itself (so if v has a direct connection from w, w is the lowest common ancestor).
+
+        */
+
+
+        System.out.println("Paring data from KI");
+
+        ReaderKI readerKI = new ReaderKI(new File("/Users/Cristian/Desktop/MesH/mesh_by_ut.csv"),true);
+        HashMap<String,List<String>> utToMeSHList = readerKI.parse();
+        System.out.println("docs in KI-data: " + utToMeSHList.size());
+        List<GenericMeSHDocument> genericMeSHDocumentList = new ArrayList<>();
+        Iterator<Map.Entry<String,List<String>>> iterator =  utToMeSHList.entrySet().iterator();
+        while((iterator.hasNext())) {
+
+         Map.Entry<String,List<String>> entry = iterator.next();
+
+         GenericMeSHDocument genericMeSHDocument = new GenericMeSHDocument(entry.getKey());
+
+         for(String s : entry.getValue()) {
+
+            MeshDescriptorCustom meshDescriptorCustom =  descriptorsMap.get(s);
+            if(meshDescriptorCustom == null) {System.out.println("not found in map: " + s); continue; }
+             genericMeSHDocument.addMeshDescriptorCustom( meshDescriptorCustom  );
+
+         }
+
+            genericMeSHDocumentList.add(genericMeSHDocument);
+        }
+
+        System.out.println("Generic documents created: " + genericMeSHDocumentList.size());
+
+        //List<MeshDescriptorCustom> d1 = new ArrayList<>(); d1.add(descriptorsMap.get("D011148"));
+        //List<MeshDescriptorCustom> d2 = new ArrayList<>(); d2.add(descriptorsMap.get("D013020")); d2.add( descriptorsMap.get("D011323") );
+
+       for(int i=1; i<100; i++) {
+           double simDoc = treeNodeMeshIndex.getSimilarityBetweenToDocuments(genericMeSHDocumentList.get(0).getMeshDescriptorCustomList(), genericMeSHDocumentList.get(i).getMeshDescriptorCustomList());
+
+           System.out.println("simDoc: " + simDoc);
+       }
+
+  //      System.out.println(meshDescriptorCustom1);
+//        System.out.println(meshDescriptorCustom1.getInformationContent());
+   //     System.out.println(meshDescriptorCustom2);
+    //    System.out.println(meshDescriptorCustom2.getInformationContent());
+
+
+
+/*
+
+        System.out.println("test 1:");
+        TreeNodeMeSH treeNodeMeSH = treeNodesMap.get("A01.378.610.250.300.792.380");
+        System.out.println(treeNodeMeSH);
+        System.out.println("parent:");
+        System.out.println(treeNodeMeSH.getParent());
+        System.out.println("children:");
+        System.out.println(treeNodeMeSH.getChildren());
+
+        System.out.println("test 2:");
 
         MeshDescriptorCustom meshDescriptorCustom = descriptorsMap.get("D001829"); //Body Regions
 
@@ -239,27 +314,13 @@ public class Sim {
 
 
 
-        meshDescriptorCustom = descriptorsMap.get("D006071"); //gorillaz
+        meshDescriptorCustom = descriptorsMap.get("D015186"); //gorillaz
 
         TreeNodeMeSH treeNodeMeSH2 = meshDescriptorCustom.getTreeNodeSet().iterator().next();
 
         System.out.println(meshDescriptorCustom.getDescriptorUI() +" " + meshDescriptorCustom.getInformationContent());
 
 
-            /*
-
-        the lowest common ancestor (LCA) of two nodes v and w in a tree  is the lowest (i.e. deepest) node that has both v and w as descendants.
-        We define each node to be a descendant of itself (so if v has a direct connection from w, w is the lowest common ancestor).
-
-         */
-
-            //TODO descendant to itself!
-
-        TreeNodeMeshIndex treeNodeMeshIndex = new TreeNodeMeshIndex(treeNodesMap);
-
-        TreeNodeMeSH treeNodeMeSH3 = treeNodeMeshIndex.getCommonAnsestor(treeNodeMeSH1,treeNodeMeSH2);
-
-        System.out.println(treeNodeMeSH3);
 
 
 
@@ -321,15 +382,15 @@ public class Sim {
             for (String s : treeNumbers2) treeNodeMeSHList.add(new TreeNodeMeSH(s));
             TreeNodeMeshIndex treeNodeMeshIndex = new TreeNodeMeshIndex(treeNodeMeSHList);
 
-            System.out.println(treeNodeMeSHList.get(20) + " " + treeNodeMeSHList.get(20) + " common: " + treeNodeMeshIndex.getCommonAnsestor(treeNodeMeSHList.get(20), treeNodeMeSHList.get(20)));
+            System.out.println(treeNodeMeSHList.get(20) + " " + treeNodeMeSHList.get(20) + " common: " + treeNodeMeshIndex.getCommonAncestor(treeNodeMeSHList.get(20), treeNodeMeSHList.get(20)));
 
-            System.out.println(treeNodeMeSHList.get(25) + " " + treeNodeMeSHList.get(60) + " common: " + treeNodeMeshIndex.getCommonAnsestor(treeNodeMeSHList.get(25), treeNodeMeSHList.get(60)));
+            System.out.println(treeNodeMeSHList.get(25) + " " + treeNodeMeSHList.get(60) + " common: " + treeNodeMeshIndex.getCommonAncestor(treeNodeMeSHList.get(25), treeNodeMeSHList.get(60)));
 
             TreeNodeMeSH a = new TreeNodeMeSH("E04.100.814.868.937.830");
             TreeNodeMeSH b = new TreeNodeMeSH("A01");
             //TreeNodeMeSH b =  new TreeNodeMeSH("E04.100.814.529.968.060");
 
-            System.out.println(a + " " + b +  " common " + treeNodeMeshIndex.getCommonAnsestor(a,b) );
+            System.out.println(a + " " + b +  " common " + treeNodeMeshIndex.getCommonAncestor(a,b) );
 
             System.exit(0);
         }
