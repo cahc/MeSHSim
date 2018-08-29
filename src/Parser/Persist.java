@@ -94,16 +94,18 @@ public class Persist {
 
         Persist persist = new Persist("pubmedTest.db");
 
-        persist.saveRecord(2, new ParsedPubMedDoc());
+        System.out.println("Records in db:" + persist.dbSize() );
 
 
        for(Map.Entry<Integer,byte[]> entry : persist.getEntrySet()) {
 
-           System.out.println(entry.getKey() + " " + persist.bytesToRecord( entry.getValue() ) );
+           System.out.println(persist.bytesToRecord( entry.getValue() ).getInternalID() );
 
        }
 
 
+
+persist.close();
 
     }
 }

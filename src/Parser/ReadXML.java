@@ -398,14 +398,20 @@ public class ReadXML {
         System.out.println("total number of docs:" + docs);
 
         System.out.println(parsedPubMedDocList.size());
-       BufferedWriter writer = new BufferedWriter( new FileWriter( new File("/Users/Cristian/test.txt")));
+      // BufferedWriter writer = new BufferedWriter( new FileWriter( new File("/Users/Cristian/test.txt")));
+       Persist persist = new Persist("pubmedTest.db");
+
+        System.out.println("Writing to database");
         for(ParsedPubMedDoc parsedPubMedDoc : parsedPubMedDocList) {
-           writer.write(parsedPubMedDoc.toString());
-           writer.newLine();
+
+            persist.saveRecord(parsedPubMedDoc.getInternalID(), parsedPubMedDoc);
         }
 
-        writer.flush();
-        writer.close();
+        persist.forceCommit();
+        persist.close();
+
+        //writer.flush();
+        //writer.close();
     }
 
 }

@@ -1,6 +1,8 @@
 package Parser;
 
-public class ParsedMeSHQualifier {
+import java.io.Serializable;
+
+public class ParsedMeSHQualifier implements Serializable {
 
         /*
 
