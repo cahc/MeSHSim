@@ -94,6 +94,9 @@ public class Persist {
 
         Persist persist = new Persist("pubmedTest.db");
 
+        persist.saveRecord(2, new ParsedPubMedDoc());
+
+
        for(Map.Entry<Integer,byte[]> entry : persist.getEntrySet()) {
 
            System.out.println(entry.getKey() + " " + persist.bytesToRecord( entry.getValue() ) );
