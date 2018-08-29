@@ -8,5 +8,10 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="it.unimi.dsi:fastutil:8.2.1" level="project" />
+    <orderEntry type="library" name="org.unix4j:unix4j-base:0.5" level="project" />
+    <orderEntry type="library" name="org.unix4j:unix4j-command:0.5" level="project" />
+    <orderEntry type="library" name="net.sf.jsignature.io-tools:easystream:1.2.15" level="project" />
+    <orderEntry type="library" name="de.ruedigermoeller:fst:2.43" level="project" />
+    <orderEntry type="library" name="com.h2database:h2:1.4.197" level="project" />
   </component>
 </module>
