@@ -4,6 +4,9 @@ import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.nustaq.serialization.FSTConfiguration;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,7 +36,7 @@ public class Persist {
 
     }
 
-    private ParsedPubMedDoc bytesToRecord(byte[] bytes) {
+    public ParsedPubMedDoc bytesToRecord(byte[] bytes) {
 
         return (ParsedPubMedDoc)this.conf.asObject(bytes);
 
@@ -90,22 +93,25 @@ public class Persist {
         store.close();
     }
 
-    public static void main(String arg[]) {
+    public static void main(String arg[]) throws IOException {
 
-        Persist persist = new Persist("pubmedTest.db");
+        Persist persist = new Persist("pubmed2009.db");
 
         System.out.println("Records in db:" + persist.dbSize() );
 
+        BufferedWriter writer = new BufferedWriter(new FileWriter("pubmed2009Text.txt"));
 
        for(Map.Entry<Integer,byte[]> entry : persist.getEntrySet()) {
 
-           System.out.println(persist.bytesToRecord( entry.getValue() ).getInternalID() );
+          // System.out.println(persist.bytesToRecord( entry.getValue() ).getInternalID() );
 
+           writer.write(persist.bytesToRecord( entry.getValue() ).toString());
+           writer.newLine();
        }
 
-
-
-persist.close();
+       writer.flush();
+       writer.close();
+        persist.close();
 
     }
 }

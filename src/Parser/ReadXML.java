@@ -49,14 +49,15 @@ public class ReadXML {
         int docs2009 = 0;
         int nrfiles = 1;
         int internalID = 1;
-        List<ParsedPubMedDoc> parsedPubMedDocList = new ArrayList<>(10000);
+        //List<ParsedPubMedDoc> parsedPubMedDocList = new ArrayList<>(10000);
 
+        Persist persist = new Persist("pubmed2009.db");
 
         List<File> test = new ArrayList<>();
 
         test.add( files[32] );
         System.out.println( test.get(0) );
-        for(File file : test) {
+        for(File file : files) {
 
             InputStream xmlin = new GZIPInputStream(new FileInputStream( file ));
 
@@ -248,7 +249,7 @@ public class ReadXML {
                                     if (year != null) {
                                         parsedPubMedDoc.setPubyear(year);
 
-                                      //if (parsedPubMedDoc.getPubyear() != 2009) continue wrongYear;
+                                      if (parsedPubMedDoc.getPubyear() != 2009) continue wrongYear;
                                      //if(parsedPubMedDoc.getPubyear()==2009) System.out.println(year + " from Year");
 
                                     }
@@ -271,7 +272,7 @@ public class ReadXML {
 
                                         Integer year = Integer.valueOf(matcher.group(0));
                                         parsedPubMedDoc.setPubyear(year);
-                                     //  if (parsedPubMedDoc.getPubyear() != 2009) continue wrongYear;
+                                     if (parsedPubMedDoc.getPubyear() != 2009) continue wrongYear;
                                      //  if(parsedPubMedDoc.getPubyear()==2009) System.out.println(year + " from MedLineDate");
 
                                     }
@@ -367,13 +368,11 @@ public class ReadXML {
 
 
                             if(parsedPubMedDoc.getPubyear() == 2009) {
-
+                                parsedPubMedDoc.setInternalID(internalID);
+                                internalID++;
+                                persist.saveRecord(parsedPubMedDoc.getInternalID(), parsedPubMedDoc);
                                 docs2009++;
                             }
-                            parsedPubMedDoc.setInternalID(internalID);
-                            internalID++;
-                            parsedPubMedDocList.add(parsedPubMedDoc);
-                           // System.out.println(parsedPubMedDoc);
 
                             break;
                         }
@@ -389,7 +388,7 @@ public class ReadXML {
 
             xmlReader.close();
             System.out.println("processed files: " + nrfiles);
-            System.out.println("number of 2009 records found so far: " + docs2009);
+            System.out.println("number of 2009 records found so far: " + docs2009 + " total seen: " + docs);
             nrfiles++;
 
         } //loop over files done
@@ -397,15 +396,16 @@ public class ReadXML {
         System.out.println("number of records (year=2009) seen: " + docs2009);
         System.out.println("total number of docs:" + docs);
 
-        System.out.println(parsedPubMedDocList.size());
+       // System.out.println(parsedPubMedDocList.size());
       // BufferedWriter writer = new BufferedWriter( new FileWriter( new File("/Users/Cristian/test.txt")));
-       Persist persist = new Persist("pubmedTest.db");
+      // Persist persist = new Persist("pubmedTest.db");
 
-        System.out.println("Writing to database");
-        for(ParsedPubMedDoc parsedPubMedDoc : parsedPubMedDocList) {
+        //System.out.println("Writing to database");
+       // for(ParsedPubMedDoc parsedPubMedDoc : parsedPubMedDocList) {
 
-            persist.saveRecord(parsedPubMedDoc.getInternalID(), parsedPubMedDoc);
-        }
+        //    persist.saveRecord(parsedPubMedDoc.getInternalID(), parsedPubMedDoc);
+       // }
+
 
         persist.forceCommit();
         persist.close();
