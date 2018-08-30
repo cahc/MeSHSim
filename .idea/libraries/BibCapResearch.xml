@@ -1,14 +1,14 @@
 <component name="libraryTable">
   <library name="BibCapResearch">
     <CLASSES>
-      <root url="jar://$USER_HOME$/Desktop/NEW_DATA_BIBCAP_2017/BibCapResearch.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/BibCapResearch.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="jar://$USER_HOME$/Desktop/NEW_DATA_BIBCAP_2017/BibCapResearch.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/BibCapResearch.jar!/" />
     </JAVADOC>
     <SOURCES>
-      <root url="jar://$USER_HOME$/Desktop/NEW_DATA_BIBCAP_2017/BibCapResearch.jar!/" />
-      <root url="jar://$USER_HOME$/Desktop/NEW_DATA_BIBCAP_2017/BibCapResearch.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/BibCapResearch.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/BibCapResearch.jar!/" />
     </SOURCES>
   </library>
 </component>
