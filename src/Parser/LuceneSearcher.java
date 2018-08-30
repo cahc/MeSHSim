@@ -4,6 +4,7 @@ import BibCap.BibCapRecord;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
@@ -15,8 +16,7 @@ import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.h2.mvstore.type.ObjectDataType;
 
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.nio.file.Paths;
 import java.util.Map;
 
@@ -192,7 +192,8 @@ public class LuceneSearcher {
 
         //add jar referens to BibCapResearch to access BibCapRecord
 
-        String mappyFileName = "/Users/Cristian/Desktop/NEW_DATA_BIBCAP_2017/mappy.db";
+        BufferedWriter writerMatchingResult = new BufferedWriter( new FileWriter( new File("matchingResult.txt")));
+        String mappyFileName = "mappy.db";
 
         MVStore store = new MVStore.Builder().cacheSize(200). // 200MB read cache
                 fileName( mappyFileName ).autoCommitBufferSize(1024). // 1MB write cache
@@ -219,37 +220,34 @@ public class LuceneSearcher {
         //SELF SEARCH: Map.Entry<Integer,byte[]> entry : persist.getEntrySet()
         //ParsedPubMedDoc target = persist.bytesToRecord(entry.getValue());
         int matchedSoFar = 0;
-        for(Map.Entry<Integer,BibCapRecord> entry : bibCapRecordMap.entrySet()  ) {
 
-            BibCapRecord target = entry.getValue();
+        try {
+            for (Map.Entry<Integer, BibCapRecord> entry : bibCapRecordMap.entrySet()) {
 
-            BooleanQuery q = createQueryFromBibCapRecord(target);
+                BibCapRecord target = entry.getValue();
 
-           // System.out.println(q);
+                BooleanQuery q = createQueryFromBibCapRecord(target);
 
-
-            TopDocs returnedDocs = searcher.search(q, 2); // max 20000 hits
-
-            ScoreDoc[] hits = returnedDocs.scoreDocs;
+                // System.out.println(q);
 
 
-         //   for (int j = 0; j < hits.length; j++) {
-          //      int luceneDocId = hits[j].doc;
-              //  System.out.println("score: " + hits[j].score);
-              //  Document d = searcher.doc(luceneDocId);
-              //  System.out.println(d.get("title"));
+                TopDocs returnedDocs = searcher.search(q, 1); // max 20000 hits
 
-         //   }
+                ScoreDoc[] hits = returnedDocs.scoreDocs;
 
 
+                //   for (int j = 0; j < hits.length; j++) {
+                //      int luceneDocId = hits[j].doc;
+                //  System.out.println("score: " + hits[j].score);
+                //  Document d = searcher.doc(luceneDocId);
+                //  System.out.println(d.get("title"));
 
+                //   }
 
-
-            if(matchedSoFar % 500 == 0) {
 
                 if (hits.length == 0) {
-                    System.out.println("no match att all!");
-
+                    writerMatchingResult.write(target.getUT() + "\t" + -99);
+                    writerMatchingResult.newLine();
 
                 } else {
 
@@ -258,41 +256,56 @@ public class LuceneSearcher {
                         double bestScore = hits[0].score;
                         double nextBest = hits[1].score;
 
-                        String searchTitle = misc.OSA.simplifyString( target.getTitle() );
+                        String searchTitle = misc.OSA.simplifyString(target.getTitle());
 
-                        String bestTitle = misc.OSA.simplifyString( searcher.doc( hits[0].doc ).get("title")  );
+                        String bestTitle = misc.OSA.simplifyString(searcher.doc(hits[0].doc).get("title"));
 
-                        String nextBestTitle = misc.OSA.simplifyString( searcher.doc( hits[1].doc ).get("title")  );
+                        String nextBestTitle = misc.OSA.simplifyString(searcher.doc(hits[1].doc).get("title"));
 
-                        double simBestTitle = misc.OSA.DamuLevSim(searchTitle,bestTitle,0.90);
-                        double simNextBestTitle = misc.OSA.DamuLevSim(searchTitle,nextBestTitle,0.9);
+                        double simBestTitle = misc.OSA.DamuLevSim(searchTitle, bestTitle, 0.90);
+                        double simNextBestTitle = misc.OSA.DamuLevSim(searchTitle, nextBestTitle, 0.9);
 
                         System.out.println("best score: " + bestScore + " simTitle: " + simBestTitle + " nextBestScore: " + nextBest + " simtitle: " + simNextBestTitle);
 
                     } else {
 
                         double bestScore = hits[0].score;
-                        String searchTitle = misc.OSA.simplifyString( target.getTitle() );
-                        String bestTitle = misc.OSA.simplifyString( searcher.doc( hits[0].doc ).get("title")  );
-                        double simBestTitle = misc.OSA.DamuLevSim(searchTitle,bestTitle,0.90);
 
-                        System.out.println("best score: " + bestScore + " simTitle: " + simBestTitle + " nextBestScore: " + -1 + " simtitle: " + -1);
+                        Document luceneDoc = searcher.doc(hits[0].doc);
 
+                        String searchTitle = misc.OSA.simplifyString(target.getTitle());
+                        String bestTitle = misc.OSA.simplifyString(luceneDoc.get("title"));
+                        double simBestTitle = misc.OSA.DamuLevSim(searchTitle, bestTitle, 0.90);
+
+                        writerMatchingResult.write(target.getUT() + "\t" + bestScore + "\t" + simBestTitle + "\t" + luceneDoc.get("internalID"));
+                        writerMatchingResult.newLine();
 
                     }
 
                 }
 
+
+                matchedSoFar++;
+                if (matchedSoFar % 1000 == 0) System.out.println("processed: " + matchedSoFar);
+
             }
 
-            matchedSoFar++;
 
-            if(matchedSoFar > 30000) break;
+            //persist.close();
+            reader.close();
+            store.close();
+            luceneIndex.close();
+
+            writerMatchingResult.flush();
+            writerMatchingResult.close();
+
+        } catch (Exception e) {
+
+            System.out.println(e);
+        } finally {
+
+            store.close();
         }
 
-
-        //persist.close();
-        reader.close();
-        store.close();
     }
 }

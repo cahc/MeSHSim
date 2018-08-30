@@ -51,7 +51,7 @@ public class ReadXML {
         int internalID = 1;
         //List<ParsedPubMedDoc> parsedPubMedDocList = new ArrayList<>(10000);
 
-        Persist persist = new Persist("pubmed2009.db");
+        Persist persist = new Persist("pubmed2009v2.db");
 
         List<File> test = new ArrayList<>();
 
