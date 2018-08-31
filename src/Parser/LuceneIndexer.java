@@ -26,7 +26,7 @@ public class LuceneIndexer {
 
         IndexWriter writer = new IndexWriter(luceneIndex,config);
 
-        Persist persist = new Persist("pubmed2009.db");
+        Persist persist = new Persist("E:\\RESEARCH2018\\PUBMED\\pubmed2009.db");
         System.out.println("Records in db:" + persist.dbSize() );
 
 

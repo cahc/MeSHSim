@@ -3,8 +3,10 @@
     <properties maven-id="it.unimi.dsi:fastutil:8.2.1" />
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/fastutil-8.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/fastutil-8.2.1.jar!/" />
     </CLASSES>
     <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/fastutil-8.2.1-javadoc.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/fastutil-8.2.1-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES />
