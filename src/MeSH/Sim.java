@@ -283,7 +283,7 @@ public class Sim {
         System.out.println("sorted");
         hej.sortMeSHdescriptorsByIC();
         System.out.println(hej.getMeshDescriptorCustomList());
-        System.exit(0);
+        //System.exit(0);
 
         //List<MeSH.MeshDescriptorCustom> d1 = new ArrayList<>(); d1.add(descriptorsMap.get("D011148"));
         //List<MeSH.MeshDescriptorCustom> d2 = new ArrayList<>(); d2.add(descriptorsMap.get("D013020")); d2.add( descriptorsMap.get("D011323") );
@@ -300,6 +300,7 @@ public class Sim {
             for(MeshDescriptorCustom descriptor : genericPubMedDoc.getMeshDescriptorCustomList() ) {
 
                 invertedIndex.addDescriptorDocumentPair(descriptor, genericPubMedDoc);
+                //break; //randomly add one..
             }
 
         }
