@@ -18,9 +18,12 @@ import java.util.*;
 /**
  * Created by crco0001 on 9/3/2018.
  */
-public class IC {
+public class ICindexer {
 
     //information value per mesh descriptor based on occurences for 2009
+    //
+    // AND index for mapping descriptors and subheadings to indices
+    //
 
     public static void main(String[] arg) throws IOException, XMLStreamException {
 
@@ -28,15 +31,16 @@ public class IC {
 
         Object2IntOpenHashMap<String> freqName = new Object2IntOpenHashMap<String>();
         Object2IntOpenHashMap<String> freqUI = new Object2IntOpenHashMap<String>();
-
-
+        HashSet<String> uniqueQualifyers = new HashSet<>();
+        HashSet<String> uniqueQualifiersUI = new HashSet<>();
         System.out.println("Records in db:" + persist.dbSize() );
-
 
 
         //calculate frequencies of meshTerms..
 
         for(Map.Entry<Integer,byte[]> entry : persist.getEntrySet()) {
+
+
 
            ParsedPubMedDoc doc =  persist.bytesToRecord(entry.getValue());
 
@@ -44,7 +48,10 @@ public class IC {
 
            HashSet<String> uniqueNames = new HashSet<>();
            HashSet<String> uniqueUI = new HashSet<>();
+
+
            for(ParsedMeSHDescriptor descriptor : parsedMeSHDescriptorList) {
+
 
 
               String UI = descriptor.getUI();
@@ -53,7 +60,12 @@ public class IC {
               uniqueNames.add(name);
               uniqueUI.add(UI);
 
+
+              for(ParsedMeSHQualifier q : descriptor.getQualifiers())  { uniqueQualifyers.add(q.getQualifierName()); uniqueQualifiersUI.add( q.getUI() ); }
+
            }
+
+
 
            for(String name : uniqueNames) freqName.addTo(name,1);
            for(String ui : uniqueUI) freqUI.addTo(ui, 1);
@@ -62,6 +74,28 @@ public class IC {
 
         //frequency done
         persist.close();
+        BufferedWriter bufferedWriter = new BufferedWriter( new FileWriter(new File("E:\\RESEARCH2018\\PUBMED\\uniqueQualifiers.txt")));
+        BufferedWriter bufferedWriter2 = new BufferedWriter( new FileWriter(new File("E:\\RESEARCH2018\\PUBMED\\QualifiersUItoIndex.txt")));
+        for(String s : uniqueQualifyers) {
+
+            bufferedWriter.write(s);
+            bufferedWriter.newLine();
+        }
+
+        bufferedWriter.flush();
+        bufferedWriter.close();
+
+        int index = 1;
+        for(String s : uniqueQualifiersUI) {
+
+            bufferedWriter2.write(s +"\t" + index);
+            bufferedWriter2.newLine();
+            index++;
+        }
+
+        bufferedWriter2.flush();
+        bufferedWriter2.close();
+
 
         int totalNumberOfTerms = 0;
 
@@ -87,14 +121,19 @@ public class IC {
         System.out.println("N sanity check: " + totalNumberOfTermsCanityCheck);
 
        // BufferedWriter writer = new BufferedWriter( new FileWriter( new File("DescriptorFreqIn2009.txt")));
-      //  BufferedWriter writer2 = new BufferedWriter( new FileWriter( new File("UIFreqIn2009.txt")));
+       BufferedWriter writer3 = new BufferedWriter( new FileWriter( new File("E:\\RESEARCH2018\\PUBMED\\DescriptorUItoIndex.txt")));
 
-        for(Object2IntMap.Entry<String> entry : freqName.object2IntEntrySet()) {
+       index = 1;
+        for(Object2IntMap.Entry<String> entry : freqUI.object2IntEntrySet()) {
 
-          // writer.write( entry.getKey() + "\t" + entry.getIntValue() );
-       //    writer.newLine();
+          writer3.write( entry.getKey() + "\t" + index );
+          writer3.newLine();
+          index++;
         }
 
+
+        writer3.flush();
+        writer3.close();
 
         for(Object2IntMap.Entry<String> entry : freqUI.object2IntEntrySet()) {
 
@@ -206,63 +245,86 @@ public class IC {
 
         //Keratoconjunctivitis [C11.187.183.394]  || Keratoconjunctivitis [C11.204.564.585] // D015186
 
-        String targetID = "D028081";
-        MeshDescriptorCustom descriptor = descriptorsMap.get(targetID);
 
 
-        System.out.println( descriptor );
 
-        //(1) get numer of occurences for D007637 in db
 
-        int freq = freqUI.getInt(targetID);
 
-        System.out.println("freq: " + freqUI.getInt(targetID));
 
-        Set<TreeNodeMeSH> treeNumbers = descriptor.getTreeNodeSet();
 
-        Set<TreeNodeMeSH> decendants = new HashSet<>();
-        for(TreeNodeMeSH treeNodeMeSH : treeNumbers) {
 
-            System.out.println("TREE NUMBERS: " + treeNodeMeSH);
 
-            decendants.addAll(treeNodeMeSH.getAllDescendents());
+
+        //loop over all descriptors
+        BufferedWriter informationContentPerDescriptor = new BufferedWriter(new FileWriter(new File("E:\\RESEARCH2018\\PUBMED\\ICperDescriptor.txt")));
+
+        for(Object2IntMap.Entry<String> entry : freqUI.object2IntEntrySet()) {
+
+            String targetID = entry.getKey();
+
+            MeshDescriptorCustom descriptor = descriptorsMap.get(targetID);
+
+
+            System.out.println(descriptor);
+
+            //(1) get numer of occurences for D007637 in db
+
+            int freq = freqUI.getInt(targetID);
+
+            System.out.println("freq: " + freqUI.getInt(targetID));
+
+            Set<TreeNodeMeSH> treeNumbers = descriptor.getTreeNodeSet();
+
+            Set<TreeNodeMeSH> decendants = new HashSet<>();
+            for (TreeNodeMeSH treeNodeMeSH : treeNumbers) {
+
+                System.out.println("TREE NUMBERS: " + treeNodeMeSH);
+
+                decendants.addAll(treeNodeMeSH.getAllDescendents());
+            }
+
+            System.out.println("decendants:");
+            System.out.println(decendants);
+
+            System.out.println("uniqe meshid on lower level");
+
+            Set<String> UIs = new HashSet<>();
+
+            for (TreeNodeMeSH treeNodeMeSH : decendants) {
+
+                System.out.println(treeNodeToUniqueMeSHID.get(treeNodeMeSH));
+                UIs.add(treeNodeToUniqueMeSHID.get(treeNodeMeSH).getDescriptorUI());
+
+            }
+
+
+            System.out.println("freq for descentants:");
+
+            int freqDecendants = 0;
+            for (String id : UIs) {
+
+                System.out.println(id + " " + freqUI.getInt(id));
+                freqDecendants = freqDecendants + freqUI.getInt(id);
+
+            }
+
+            double P = (freq + freqDecendants) / (double) totalNumberOfTerms;
+
+            //double res = log10(n)/log10(2);
+            double normFactorToGetLog2 = Math.log10(2);
+
+            double ic = -(Math.log10(P) / normFactorToGetLog2);
+
+            System.out.println("P: " + P + " ICindexer: " + ic);
+
+            informationContentPerDescriptor.write(targetID +"\t" + freq +"\t" + freqDecendants +"\t" + P + "\t" +ic);
+            informationContentPerDescriptor.newLine();
+
+
         }
 
-        System.out.println("decendants:");
-        System.out.println(decendants);
-
-        System.out.println("uniqe meshid on lower level");
-
-        Set<String> UIs = new HashSet<>();
-
-        for(TreeNodeMeSH treeNodeMeSH : decendants) {
-
-            System.out.println( treeNodeToUniqueMeSHID.get(treeNodeMeSH) );
-            UIs.add( treeNodeToUniqueMeSHID.get(treeNodeMeSH).getDescriptorUI()  );
-
-        }
-
-
-        System.out.println("freq for descentants:");
-
-        int freqDecendants = 0;
-        for(String id : UIs) {
-
-            System.out.println(id +" " + freqUI.getInt(id) );
-            freqDecendants = freqDecendants + freqUI.getInt(id);
-
-        }
-
-        double P = (freq+freqDecendants)/(double)totalNumberOfTerms;
-
-        //double res = log10(n)/log10(2);
-        double normFactorToGetLog2 = Math.log10(2);
-
-        double ic = -(Math.log10(P)/normFactorToGetLog2);
-
-        System.out.println("P: " + P + " IC: " + ic);
-
-
+        informationContentPerDescriptor.flush();
+        informationContentPerDescriptor.close();
     }
 
 }

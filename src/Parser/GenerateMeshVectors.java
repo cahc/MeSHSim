@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import jsat.linear.SparseVector;
+import misc.Helpers;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -240,6 +241,12 @@ public class GenerateMeshVectors {
 
         System.out.println("nnz (vektor1)" + sparseVectorList.get(0).nnz());
         System.out.println("nnz (vectorN)" + sparseVectorList.get(455756).nnz());
+
+        System.out.println( Helpers.printSparseVector(sparseVectorList.get(0)) );
+
+        System.out.println();
+
+        System.out.println( Helpers.printSparseVector(sparseVectorList.get(455756)) );
 
     }
 
