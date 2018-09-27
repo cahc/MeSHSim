@@ -98,6 +98,8 @@ public class LuceneSearcher {
         stream.close();
 
 
+        //if author information is known (last name) create such an MUST query, otherwise ignore
+
         BooleanQuery finalQuery = new BooleanQuery.Builder().add(bq.build(),BooleanClause.Occur.MUST).add(bq2.build(),BooleanClause.Occur.SHOULD).add(bq3.build(),BooleanClause.Occur.MUST).build();
 
 
