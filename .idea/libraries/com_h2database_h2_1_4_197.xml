@@ -3,10 +3,8 @@
     <properties maven-id="com.h2database:h2:1.4.197" />
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/h2-1.4.197.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/h2-1.4.197.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="jar://$PROJECT_DIR$/lib/h2-1.4.197-javadoc.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/h2-1.4.197-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES />

@@ -21,6 +21,18 @@ public class ParsedPubMedDoc implements Serializable {
     List<ParsedMeSHDescriptor> mesh = new ArrayList<>();
 
     List<String> publicationTypes = new ArrayList<>(2);
+    List<String> authorLastNames = new ArrayList<>(4);
+
+    public void addAuthorLastName(String lastName) {
+
+
+        authorLastNames.add(lastName);
+    }
+
+    public List<String> getAuthorLastNames() {
+
+        return this.authorLastNames;
+    }
 
     public StringBuilder getAbstractText() {
         return abstractText;
@@ -112,7 +124,7 @@ public class ParsedPubMedDoc implements Serializable {
 
     @Override
     public String toString() {
-        return internalID + "\t" + pmid  +"\t" + doi + "\t" + title + "\t" + pubyear + "\t" + journal + "\t" + mesh + "\t" + publicationTypes + "\t" + abstractText;
+        return internalID + "\t" + pmid  +"\t" + doi + "\t" + title + "\t" + pubyear + "\t" + journal + "\t" + mesh + "\t" + publicationTypes + "\t" + abstractText + "\t" + authorLastNames;
 
     }
 }

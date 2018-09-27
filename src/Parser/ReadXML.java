@@ -51,7 +51,7 @@ public class ReadXML {
         int internalID = 1;
         //List<ParsedPubMedDoc> parsedPubMedDocList = new ArrayList<>(10000);
 
-        Persist persist = new Persist("pubmed2009v2.db");
+        Persist persist = new Persist("pubmed2009v3.db");
 
         List<File> test = new ArrayList<>();
 
@@ -316,6 +316,48 @@ public class ReadXML {
 
                            continue;
                         }
+
+                        /*
+                        <AuthorList CompleteYN="Y">
+                        <Author ValidYN="Y">
+                        <LastName>Van Landuyt</LastName>
+                        <ForeName>P</ForeName>
+                        <Initials>P</Initials>
+                        <AffiliationInfo>
+                         <Affiliation>Université Catholique de Louvain, Département des Sciences des Matériaux et des Procédés, PCIM, Louvain-la-Neuve, Belgium.</Affiliation>
+                        </AffiliationInfo>
+                        </Author>
+                        <Author ValidYN="Y">
+                        <LastName>Streydio</LastName>
+                        <ForeName>J M</ForeName>
+                        <Initials>JM</Initials>
+                        </Author>
+                        </AuthorList>
+
+                         */
+
+                        if (isStart && event.asStartElement().getName().getLocalPart().equals("AuthorList")) {
+
+
+                            while(true) {
+                                event = xmlReader.nextEvent();
+                                isStart = event.isStartElement();
+                                isEnd = event.isEndElement();
+
+                                if(isStart && event.asStartElement().getName().getLocalPart().equals("LastName")) {
+
+                                    parsedPubMedDoc.addAuthorLastName( xmlReader.getElementText() );
+                                }
+
+
+                                if(isEnd && event.asEndElement().getName().getLocalPart().equals("AuthorList")) break;
+                            }
+
+                            continue;
+                        }
+
+
+
 
 
 
