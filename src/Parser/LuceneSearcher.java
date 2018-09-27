@@ -18,6 +18,7 @@ import org.h2.mvstore.type.ObjectDataType;
 
 import java.io.*;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 
 public class LuceneSearcher {
@@ -28,7 +29,7 @@ public class LuceneSearcher {
 
     public static BooleanQuery createQueryFromBibCapRecord(BibCapRecord doc) throws IOException {
 
-        BooleanQuery.setMaxClauseCount(3000);
+        BooleanQuery.setMaxClauseCount(3500);
         String title = doc.getTitle();
 
         TokenStream stream = LuceneSearcher.standardAnalyzer.tokenStream(null, new StringReader(title));
@@ -98,7 +99,28 @@ public class LuceneSearcher {
         stream.close();
 
 
-        BooleanQuery finalQuery = new BooleanQuery.Builder().add(bq.build(),BooleanClause.Occur.MUST).add(bq2.build(),BooleanClause.Occur.SHOULD).add(bq3.build(),BooleanClause.Occur.MUST).build();
+        String firstAuthor = doc.getFirstAuthor();
+
+        stream = LuceneSearcher.standardAnalyzer.tokenStream(null, new StringReader(firstAuthor));
+        cattr = stream.addAttribute(CharTermAttribute.class);
+        stream.reset(); //??
+        BooleanQuery.Builder bq4 = new BooleanQuery.Builder();
+
+        while (stream.incrementToken()) {
+
+            String term = cattr.toString();
+
+            if(term.length() > 1)   bq4.add(new TermQuery(new Term("lastnames", term)),BooleanClause.Occur.SHOULD); //dont add initials
+
+
+        }
+
+        stream.end();
+        stream.close();
+
+
+
+        BooleanQuery finalQuery = new BooleanQuery.Builder().add(bq.build(),BooleanClause.Occur.MUST).add(bq2.build(),BooleanClause.Occur.SHOULD).add(bq3.build(),BooleanClause.Occur.MUST).add(bq4.build(),BooleanClause.Occur.SHOULD).build();
 
 
         return finalQuery;
@@ -178,9 +200,52 @@ public class LuceneSearcher {
         stream.close();
 
 
+        List<String> authorLastNames = doc.getAuthorLastNames();
+
+        StringBuilder names = new StringBuilder();
+        if(authorLastNames.size() == 0) {
+
+            names.append("UNKNOWN");
+
+        } else {
+
+            boolean first = true;
+            for(int i=0; i<authorLastNames.size(); i++) {
+
+                if(first) {
+
+                    names.append(authorLastNames.get(i));
+                    first = false;
+                } else {
+
+                    names.append(" ").append(authorLastNames.get(i));
+                }
+
+            }
+
+        }
 
 
-       BooleanQuery finalQuery = new BooleanQuery.Builder().add(bq.build(),BooleanClause.Occur.MUST).add(bq2.build(),BooleanClause.Occur.SHOULD).add(bq3.build(),BooleanClause.Occur.MUST).build();
+        stream = LuceneSearcher.standardAnalyzer.tokenStream(null, new StringReader(names.toString()));
+        cattr = stream.addAttribute(CharTermAttribute.class);
+        stream.reset(); //??
+        BooleanQuery.Builder bq4 = new BooleanQuery.Builder();
+
+        while (stream.incrementToken()) {
+
+            String term = cattr.toString();
+
+            bq4.add(new TermQuery(new Term("lastnames", term)),BooleanClause.Occur.SHOULD);
+
+
+        }
+
+        stream.end();
+        stream.close();
+
+
+
+        BooleanQuery finalQuery = new BooleanQuery.Builder().add(bq.build(),BooleanClause.Occur.MUST).add(bq2.build(),BooleanClause.Occur.SHOULD).add(bq3.build(),BooleanClause.Occur.MUST).add(bq4.build(),BooleanClause.Occur.SHOULD).build();
 
 
       return finalQuery;
