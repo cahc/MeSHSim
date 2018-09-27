@@ -95,11 +95,11 @@ public class Persist {
 
     public static void main(String arg[]) throws IOException {
 
-        Persist persist = new Persist("pubmed2009.db");
+        Persist persist = new Persist("pubmed2009v3.db");
 
         System.out.println("Records in db:" + persist.dbSize() );
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter("pubmed2009Text.txt"));
+        BufferedWriter writer = new BufferedWriter(new FileWriter("pubmed2009Textv3.txt"));
 
        for(Map.Entry<Integer,byte[]> entry : persist.getEntrySet()) {
 
@@ -111,7 +111,7 @@ public class Persist {
 
        writer.flush();
        writer.close();
-        persist.close();
+       persist.close();
 
     }
 }
