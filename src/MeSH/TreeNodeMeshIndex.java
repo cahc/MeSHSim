@@ -137,7 +137,7 @@ public class TreeNodeMeshIndex {
 
        // System.out.println("# candidates: " + queue.size());
        // System.out.println("best:");
-        MeshDescriptorCustom max = queue.peek(); //max with respect to common anscestors IC
+        MeshDescriptorCustom max = queue.peek(); //max with respect to common anscestors ICindexer
        // System.out.println(max.getDescriptorUI() + " " + max.getDescriptorName() + " " + max.getInformationContent());
         return max.getInformationContent();
     }

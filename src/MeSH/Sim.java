@@ -180,7 +180,7 @@ public class Sim {
 
     /*
 
-    IC calculations
+    ICindexer calculations
 
       pobability for the ID + the probability for all id:s with a lower treenumber
      */
@@ -538,8 +538,8 @@ public class Sim {
             URI c2 = factory.getURI("http://www.nlm.nih.gov/mesh/", "D041883"); // male
 
 
-           // System.out.println("IC D013812:" + engine.getIC(icConf,c1));
-            //System.out.println("IC D041883: " + engine.getIC(icConf,c2));
+           // System.out.println("ICindexer D013812:" + engine.getIC(icConf,c1));
+            //System.out.println("ICindexer D041883: " + engine.getIC(icConf,c2));
 
             // We compute the similarity
             //double sim = engine.compare(measureConf, c1, c2);
