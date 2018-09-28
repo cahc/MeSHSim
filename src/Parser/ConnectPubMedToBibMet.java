@@ -396,13 +396,13 @@ public class ConnectPubMedToBibMet {
 
 
 
-        Persist persist = new Persist("E:\\RESEARCH2018\\PUBMED\\pubmed2009.db");
-        BufferedReader reader = new BufferedReader( new FileReader( new File("E:\\RESEARCH2018\\PUBMED\\matchingResult.txt") ));
+        Persist persist = new Persist("pubmed2009v3.db");
+        BufferedReader reader = new BufferedReader( new FileReader( new File("matchingResult.txt") ));
 
 
 
        // BufferedWriter writer = new BufferedWriter( new FileWriter(new File("E:\\RESEARCH2018\\PUBMED\\UT_TO_MESH_CC_VERSION.txt")));
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("E:\\RESEARCH2018\\PUBMED\\UT_TO_MESH_CC_VERSION3.txt"), StandardCharsets.UTF_8));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("UT_TO_MESH_CC_VERSIONv3.txt"), StandardCharsets.UTF_8));
 
         System.out.println("Records in db:" + persist.dbSize() );
 
@@ -451,7 +451,7 @@ writer.write(stringBuilder.toString());
             String UT = parts[0];
 
 
-            if(problematicUTs.contains(UT)) continue; // duplicates and stuff
+          //  if(problematicUTs.contains(UT)) continue; // duplicates and stuff
 
             ParsedPubMedDoc doc = persist.retrieveRecord(idInpubmedDb);
 

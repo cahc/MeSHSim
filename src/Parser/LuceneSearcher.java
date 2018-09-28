@@ -268,7 +268,7 @@ public class LuceneSearcher {
 
         MVMap<Integer, BibCapRecord> bibCapRecordMap = store.openMap("mymap", new MVMap.Builder<Integer, BibCapRecord>().keyType(new ObjectDataType()).valueType(new BibCapRecord()));
 
-        System.out.println("Bibcap records" + bibCapRecordMap.size());
+        System.out.println("Bibcap records: " + bibCapRecordMap.size());
 
 
         //setup lucene index

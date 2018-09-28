@@ -1,4 +1,4 @@
 Parser.ReadXML --> create database with 2009 docs in pubmed
 java -cp MeSHSim.jar Parser.LuceneIndexer // indexthem
 java -cp MeSHSim.jar Parser.LuceneSearcher // match
-
+java -cp MeSHSim.jar Parser.ConnectPubMedToBibMet
