@@ -3,10 +3,8 @@ package Parser;
 import MeSH.MeSHParser;
 import MeSH.MeshDescriptorCustom;
 import MeSH.TreeNodeMeSH;
-import com.fasterxml.jackson.core.TreeNode;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.BufferedWriter;
@@ -25,9 +23,34 @@ public class ICindexer {
     // AND index for mapping descriptors and subheadings to indices
     //
 
+
+
     public static void main(String[] arg) throws IOException, XMLStreamException {
 
-        Persist persist = new Persist("E:\\RESEARCH2018\\PUBMED\\pubmed2009.db");
+        class FreqStat {
+
+            int freq;
+            int freqDesc;
+
+
+            public int getFreq() {
+                return freq;
+            }
+
+            public void setFreq(int freq) {
+                this.freq = freq;
+            }
+
+            public int getFreqDesc() {
+                return freqDesc;
+            }
+
+            public void setFreqDesc(int freqDesc) {
+                this.freqDesc = freqDesc;
+            }
+        }
+
+        Persist persist = new Persist("pubmed2009v3.db");
 
         Object2IntOpenHashMap<String> freqName = new Object2IntOpenHashMap<String>();
         Object2IntOpenHashMap<String> freqUI = new Object2IntOpenHashMap<String>();
@@ -74,8 +97,8 @@ public class ICindexer {
 
         //frequency done
         persist.close();
-        BufferedWriter bufferedWriter = new BufferedWriter( new FileWriter(new File("E:\\RESEARCH2018\\PUBMED\\uniqueQualifiers.txt")));
-        BufferedWriter bufferedWriter2 = new BufferedWriter( new FileWriter(new File("E:\\RESEARCH2018\\PUBMED\\QualifiersUItoIndex.txt")));
+        BufferedWriter bufferedWriter = new BufferedWriter( new FileWriter(new File("UniqueQualifiers.txt")));
+        BufferedWriter bufferedWriter2 = new BufferedWriter( new FileWriter(new File("QualifiersUItoIndex.txt")));
         for(String s : uniqueQualifyers) {
 
             bufferedWriter.write(s);
@@ -120,8 +143,8 @@ public class ICindexer {
         System.out.println("N: " + totalNumberOfTerms);
         System.out.println("N sanity check: " + totalNumberOfTermsCanityCheck);
 
-       // BufferedWriter writer = new BufferedWriter( new FileWriter( new File("DescriptorFreqIn2009.txt")));
-       BufferedWriter writer3 = new BufferedWriter( new FileWriter( new File("E:\\RESEARCH2018\\PUBMED\\DescriptorUItoIndex.txt")));
+       //BufferedWriter writer = new BufferedWriter( new FileWriter( new File("DescriptorFreqIn2009.txt")));
+       BufferedWriter writer3 = new BufferedWriter( new FileWriter( new File("DescriptorUItoIndex.txt")));
 
        index = 1;
         for(Object2IntMap.Entry<String> entry : freqUI.object2IntEntrySet()) {
@@ -152,7 +175,7 @@ public class ICindexer {
 
         Map<String, MeshDescriptorCustom> descriptorsMap;
 
-        MeSHParser meSHParser = new MeSHParser("E:\\RESEARCH2018\\PUBMED\\desc2018.xml");
+        MeSHParser meSHParser = new MeSHParser("desc2018.xml");
 
         descriptorsMap = meSHParser.parse();
 
@@ -256,8 +279,11 @@ public class ICindexer {
 
 
         //loop over all descriptors
-        BufferedWriter informationContentPerDescriptor = new BufferedWriter(new FileWriter(new File("E:\\RESEARCH2018\\PUBMED\\ICperDescriptor.txt")));
+        BufferedWriter informationContentPerDescriptor = new BufferedWriter(new FileWriter(new File("ICperDescriptor.txt")));
 
+        HashMap<String,FreqStat> mapWithUItoFreqStat = new HashMap<>();
+
+        int sumTotalFreq = 0;
         for(Object2IntMap.Entry<String> entry : freqUI.object2IntEntrySet()) {
 
             String targetID = entry.getKey();
@@ -317,10 +343,34 @@ public class ICindexer {
 
             System.out.println("P: " + P + " ICindexer: " + ic);
 
-            informationContentPerDescriptor.write(targetID +"\t" + freq +"\t" + freqDecendants +"\t" + P + "\t" +ic);
+
+            //collect to get overall freq, sum P sum to 1
+            FreqStat freqStat = new FreqStat();
+            freqStat.setFreq(freq);
+            freqStat.setFreqDesc(freqDecendants);
+
+
+            mapWithUItoFreqStat.put(targetID,freqStat);
+            sumTotalFreq = sumTotalFreq + freq + freqDecendants;
+
+            //informationContentPerDescriptor.write(targetID +"\t" + freq +"\t" + freqDecendants +"\t" + P + "\t" +ic);
+            //informationContentPerDescriptor.newLine();
+
+
+        }
+        double normFactorToGetLog2 = Math.log10(2);
+        for(Map.Entry<String,FreqStat> entry : mapWithUItoFreqStat.entrySet()) {
+
+            FreqStat freqStat = entry.getValue();
+
+            int freq = freqStat.getFreq();
+            int freqDec = freqStat.getFreqDesc();
+
+            double P = (freq + freqDec) / (double)sumTotalFreq;
+            double ic = -(Math.log10(P) / normFactorToGetLog2);
+
+            informationContentPerDescriptor.write(entry.getKey() +"\t" + freq +"\t" + freqDec + "\t" + P +"\t" + ic );
             informationContentPerDescriptor.newLine();
-
-
         }
 
         informationContentPerDescriptor.flush();
