@@ -4,5 +4,7 @@ java -cp MeSHSim.jar Parser.LuceneSearcher // match
 java -cp MeSHSim.jar Parser.ConnectPubMedToBibMet
 java -cp MeSHSim.jar Parser.ICindexer
 
-/TODO ignore check terms
+/TODO ignore check terms and implement major boost
 java -cp MeSHSim.jar Parser.GenerateMeshVectors
+
+./knng -k=25 -alpha=5 -enh=10 -scale -norm=2 -ftmRead=clu -ftmWrite=clu l2knn MeSHVectors.clu MeSHSimVectorsk25.clu

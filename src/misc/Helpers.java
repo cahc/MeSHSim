@@ -27,4 +27,38 @@ public class Helpers {
         return stringbuilder.toString();
     }
 
-}
+
+    public static String printSparseVectorOneBasedToCluto(SparseVector vec) {
+
+
+        StringBuilder stringbuilder = new StringBuilder();
+        Iterator<IndexValue> iter = vec.getNonZeroIterator();
+
+        boolean firstPair = true;
+
+        while (iter.hasNext()) {
+
+            IndexValue indexValue = iter.next();
+
+            if (firstPair) {
+                stringbuilder.append(indexValue.getIndex() + 1).append(" ");
+                stringbuilder.append(indexValue.getValue());
+                firstPair = false;
+            } else {
+
+                stringbuilder.append(" ").append(indexValue.getIndex() + 1).append(" ");
+                stringbuilder.append(indexValue.getValue());
+
+            }
+
+        }
+
+        return stringbuilder.toString();
+    }
+
+
+
+
+    }
+
+

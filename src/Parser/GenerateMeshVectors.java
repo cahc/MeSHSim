@@ -1,5 +1,6 @@
 package Parser;
 
+import Index.SparseDoc;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
@@ -9,10 +10,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import jsat.linear.SparseVector;
 import misc.Helpers;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +60,7 @@ public class GenerateMeshVectors {
         Object2IntMap<String> qualifyerToIndex = new Object2IntOpenHashMap<>();
 
 
-        try (BufferedReader in = new BufferedReader(new FileReader("E:\\RESEARCH2018\\PUBMED\\ICperDescriptor.txt")) ) {
+        try (BufferedReader in = new BufferedReader(new FileReader("ICperDescriptor.txt")) ) {
             String line;
 
             while ((line = in.readLine()) != null) {
@@ -82,7 +80,7 @@ public class GenerateMeshVectors {
         System.out.println("ic mappings: " + descriptorToIC.size());
 
 
-        try (BufferedReader in = new BufferedReader(new FileReader("E:\\RESEARCH2018\\PUBMED\\DescriptorUItoIndex.txt")) ) {
+        try (BufferedReader in = new BufferedReader(new FileReader("DescriptorUItoIndex.txt")) ) {
             String line;
 
             while ((line = in.readLine()) != null) {
@@ -103,7 +101,7 @@ public class GenerateMeshVectors {
 
 
 
-        try (BufferedReader in = new BufferedReader(new FileReader("E:\\RESEARCH2018\\PUBMED\\QualifiersUItoIndex.txt")) ) {
+        try (BufferedReader in = new BufferedReader(new FileReader("QualifiersUItoIndex.txt")) ) {
             String line;
 
             while ((line = in.readLine()) != null) {
@@ -131,7 +129,7 @@ public class GenerateMeshVectors {
 
 
 
-        BufferedReader bibMetMesh = new BufferedReader( new FileReader("E:\\RESEARCH2018\\PUBMED\\UT_TO_MESH_CC_VERSION.txt"));
+        BufferedReader bibMetMesh = new BufferedReader( new FileReader("UT_TO_MESH_CC_VERSIONv3.txt"));
 
         String header = bibMetMesh.readLine();
         List<SparseVector> sparseVectorList = new ArrayList<>();
@@ -174,8 +172,10 @@ public class GenerateMeshVectors {
 
                    //get the true index, ZERO BASED
                    int newIndex = mapDescriptorIndexToVectorIndex(descriptorIndex)-1;
+                   double icValue = descriptorToIC.getDouble(descriptorID);
+                   if(icValue == 0) { System.out.println("catastrophic failure"); System.exit(0); }
 
-                   sparseVector.set(newIndex,10); // temp weight of 10
+                   sparseVector.set(newIndex,icValue); // temp weight of 10
 
                    //also check if there is an qualifier
 
@@ -235,6 +235,7 @@ public class GenerateMeshVectors {
         }
 
 
+
         sparseVectorList.add(sparseVector); // ad the last one
 
         System.out.println(sparseVectorList.size());
@@ -247,6 +248,27 @@ public class GenerateMeshVectors {
         System.out.println();
 
         System.out.println( Helpers.printSparseVector(sparseVectorList.get(455756)) );
+
+        System.out.println("D013577");
+        System.out.println(descriptorToIndex.getInt("D013577") );
+        System.out.println(mapDescriptorIndexToVectorIndex( descriptorToIndex.getInt("D013577")  ));
+        System.out.println(descriptorToIC.getDouble("D013577"));
+
+        int nnz=0;
+        for(SparseVector d : sparseVectorList) nnz += d.nnz();
+
+        BufferedWriter writer = new BufferedWriter( new FileWriter( new File("MeSHVectors.clu")));
+
+        writer.write(sparseVectorList.size() +" " + totalVectorLength + " " + nnz);
+        writer.newLine();
+        for(SparseVector d : sparseVectorList) {
+
+            writer.write(Helpers.printSparseVectorOneBasedToCluto(d));
+            writer.newLine();
+        }
+
+        writer.flush();
+        writer.close();
 
     }
 
