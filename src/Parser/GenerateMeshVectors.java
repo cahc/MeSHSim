@@ -1,6 +1,7 @@
 package Parser;
 
 import Index.SparseDoc;
+import MeSH.CheckTags;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
@@ -55,6 +56,7 @@ public class GenerateMeshVectors {
     public static void main(String[] arg) throws IOException {
 
 
+        CheckTags checkTags = new CheckTags();
         Object2DoubleMap<String> descriptorToIC = new Object2DoubleOpenHashMap<>();
         Object2IntMap<String> descriptorToIndex = new Object2IntOpenHashMap<>();
         Object2IntMap<String> qualifyerToIndex = new Object2IntOpenHashMap<>();
@@ -128,6 +130,7 @@ public class GenerateMeshVectors {
 
 
 
+        BufferedWriter meshVectorToIds = new BufferedWriter( new FileWriter( new File("subsetOrderedIDs.txt")));
 
         BufferedReader bibMetMesh = new BufferedReader( new FileReader("UT_TO_MESH_CC_VERSIONv3.txt"));
 
@@ -140,7 +143,7 @@ public class GenerateMeshVectors {
 
         bibMetMesh.mark(500);
         boolean fistRow = true;
-
+        int newId = 1;
         while( (line = bibMetMesh.readLine()) != null) {
 
             String[] parts = line.split("\t");
@@ -156,16 +159,18 @@ public class GenerateMeshVectors {
                if(descriptorIndex == 0) {System.out.println("Catastrophic error!, descriptor to index == 0"); System.exit(0); }
 
                int qualiferIndex = -1;
-               if(qualifyerID.length() > 3) {
+               if(qualifyerID.length() > 3) { // qualifiers are not always present
 
                    qualiferIndex = qualifyerToIndex.getInt(qualifyerID);
                    if(qualiferIndex == 0) {System.out.println("Catastrophic error!, qualifyer to index == 0"); System.exit(0); }
                }
 
+
                //keep track of repeating descriptors,
 
                boolean seenBefore = seenIndicesForDescriptors.contains(descriptorIndex);
 
+               //crazy code below.., as major indicator can come anytime, fix this mess
                if(!seenBefore) { //not seen before
 
                    seenIndicesForDescriptors.add(descriptorIndex);
@@ -173,9 +178,19 @@ public class GenerateMeshVectors {
                    //get the true index, ZERO BASED
                    int newIndex = mapDescriptorIndexToVectorIndex(descriptorIndex)-1;
                    double icValue = descriptorToIC.getDouble(descriptorID);
+                   if(isMajor) icValue = icValue *2; //
+
                    if(icValue == 0) { System.out.println("catastrophic failure"); System.exit(0); }
 
-                   sparseVector.set(newIndex,icValue); // temp weight of 10
+                   if(checkTags.isAcheckTag(descriptorID)) {
+
+                       //just ignore if it is a check term for now..
+
+                   } else {
+
+                       sparseVector.set(newIndex,icValue); // icValue
+                   }
+
 
                    //also check if there is an qualifier
 
@@ -184,6 +199,7 @@ public class GenerateMeshVectors {
                        //get the true index, ZERO BASED
                        int newIndex2 = mapQualifierIndexToVectorIndex(descriptorIndex,qualiferIndex)-1;
 
+
                        sparseVector.set(newIndex2,1); //temp weight of 1
                    }
 
@@ -191,6 +207,31 @@ public class GenerateMeshVectors {
 
 
                } else { //seen descriptor before
+
+                   //but it might or might not have been classifyed as major..
+
+                   if(isMajor) {
+
+                       //System.out.println("overwrite with major boost..");
+                       //lets overwright the old value
+
+                       int newIndex = mapDescriptorIndexToVectorIndex(descriptorIndex)-1;
+                       double icValue = descriptorToIC.getDouble(descriptorID);
+                       icValue = icValue *2; //
+
+                       if(icValue == 0) { System.out.println("catastrophic failure"); System.exit(0); }
+
+                       if(checkTags.isAcheckTag(descriptorID)) {
+
+                           //just ignore if it is a check term for now..
+
+                       } else {
+
+                           sparseVector.set(newIndex,icValue); // icValue
+                       }
+
+
+                   }
 
                    //there might be a qualifier to add however
 
@@ -227,7 +268,13 @@ public class GenerateMeshVectors {
 
                 fistRow =false;
 
+                meshVectorToIds.write(currentUT +"\t" + newId +"\t" +parts[1]); //ut, ordered internal ID, pmid
+                meshVectorToIds.newLine();
+                newId++;
+
                 continue;
+
+
             }
 
             bibMetMesh.mark(500);
@@ -235,6 +282,8 @@ public class GenerateMeshVectors {
         }
 
 
+        meshVectorToIds.flush();
+        meshVectorToIds.close();
 
         sparseVectorList.add(sparseVector); // ad the last one
 
