@@ -27,6 +27,8 @@ public class ICindexer {
 
     public static void main(String[] arg) throws IOException, XMLStreamException {
 
+        if(arg.length != 1) {System.out.println("supply pubmedDB"); System.exit(0); }
+
         class FreqStat {
 
             int freq;
@@ -50,7 +52,11 @@ public class ICindexer {
             }
         }
 
-        Persist persist = new Persist("pubmed2009v3.db");
+       // Persist persist = new Persist("pubmed2009v3.db");
+
+            Persist persist = new Persist(arg[0]);
+
+
 
         Object2IntOpenHashMap<String> freqName = new Object2IntOpenHashMap<String>();
         Object2IntOpenHashMap<String> freqUI = new Object2IntOpenHashMap<String>();
