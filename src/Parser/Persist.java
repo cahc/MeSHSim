@@ -20,7 +20,7 @@ public class Persist {
 
     public Persist(String databaseFile) {
 
-        this.store = new MVStore.Builder().cacheSize(256).autoCommitBufferSize(2048).fileName(databaseFile).open();
+        this.store = new MVStore.Builder().cacheSize(256).autoCommitBufferSize(4096).fileName(databaseFile).open();
         this.store.setVersionsToKeep(0);
         this.store.setReuseSpace(true);
         this.map = store.openMap("records");

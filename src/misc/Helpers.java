@@ -215,7 +215,7 @@ public class Helpers {
 
 
       SparseMatrixToCluto(sparseMatrix,"/Users/Cristian/Desktop/NEW_DATA_BIBCAP_2017/PubMed/MeSHSimvectors/MeSHSimVectorsk25SymetricUpperRight.clu");
-     SparseMatrixToIJV(sparseMatrix,"/Users/Cristian/Desktop/NEW_DATA_BIBCAP_2017/PubMed/MeSHSimvectors/MeSHSimVectorsk25SymetricUpperRight.ijv","\t");
+      SparseMatrixToIJV(sparseMatrix,"/Users/Cristian/Desktop/NEW_DATA_BIBCAP_2017/PubMed/MeSHSimvectors/MeSHSimVectorsk25SymetricUpperRight.ijv","\t");
 
 
     }

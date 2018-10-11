@@ -9,6 +9,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,9 +21,12 @@ public class ReadXML {
 
         Pattern pattern = Pattern.compile("\\d{4}");
 
-        /** The XML content of these elements is wrapped with CDATA blocks, to avoid XML parser problems */
+        HashSet<Integer> consideredYears = new HashSet();
+        consideredYears.add(2017); consideredYears.add(2016);
+        consideredYears.add(2015); consideredYears.add(2014);
+        consideredYears.add(2013);
 
-      // final String [] CDATA_ELEMENTS = new String[] { "ArticleTitle", "AbstractText" };
+        boolean getAbstracts = false;
 
 
         File f = new File("/Users/Cristian/Downloads/baseline"); // current directory
@@ -46,17 +50,14 @@ public class ReadXML {
 
         System.out.println(files.length + " compressed xml-files found. Parsing..");
         int docs = 0;
-        int docs2009 = 0;
+        int docsForConsideredYears = 0;
         int nrfiles = 1;
         int internalID = 1;
         //List<ParsedPubMedDoc> parsedPubMedDocList = new ArrayList<>(10000);
 
-        Persist persist = new Persist("pubmed2009v3.db");
+        Persist persist = new Persist("pubmed2013-2017.db");
 
-        List<File> test = new ArrayList<>();
 
-        test.add( files[32] );
-        System.out.println( test.get(0) );
         for(File file : files) {
 
             InputStream xmlin = new GZIPInputStream(new FileInputStream( file ));
@@ -249,7 +250,7 @@ public class ReadXML {
                                     if (year != null) {
                                         parsedPubMedDoc.setPubyear(year);
 
-                                      if (parsedPubMedDoc.getPubyear() != 2009) continue wrongYear;
+                                      if (!consideredYears.contains(parsedPubMedDoc.getPubyear()) ) continue wrongYear;
                                      //if(parsedPubMedDoc.getPubyear()==2009) System.out.println(year + " from Year");
 
                                     }
@@ -272,7 +273,7 @@ public class ReadXML {
 
                                         Integer year = Integer.valueOf(matcher.group(0));
                                         parsedPubMedDoc.setPubyear(year);
-                                     if (parsedPubMedDoc.getPubyear() != 2009) continue wrongYear;
+                                     if (!consideredYears.contains(parsedPubMedDoc.getPubyear()) ) continue wrongYear;
                                      //  if(parsedPubMedDoc.getPubyear()==2009) System.out.println(year + " from MedLineDate");
 
                                     }
@@ -370,11 +371,11 @@ public class ReadXML {
                         // </Abstract>
 
 
-                        if(isStart && event.asStartElement().getName().getLocalPart().equals("AbstractText")) {
+                        if(getAbstracts) {
 
-                            StringBuilder stringBuilder = new StringBuilder(200);
+                            if (isStart && event.asStartElement().getName().getLocalPart().equals("AbstractText")) {
 
-
+                                StringBuilder stringBuilder = new StringBuilder(200);
 
 
                                 while (true) {
@@ -387,33 +388,37 @@ public class ReadXML {
                                     }
 
 
-                                    if (event.isEndElement() && event.asEndElement().getName().getLocalPart().equals("AbstractText")) break;
+                                    if (event.isEndElement() && event.asEndElement().getName().getLocalPart().equals("AbstractText"))
+                                        break;
 
                                 }
 
 
-                          if(parsedPubMedDoc.getAbstractText().length() == 0)  { parsedPubMedDoc.addAbstractText( stringBuilder.toString() ); } else {
+                                if (parsedPubMedDoc.getAbstractText().length() == 0) {
+                                    parsedPubMedDoc.addAbstractText(stringBuilder.toString());
+                                } else {
 
-                              parsedPubMedDoc.addAbstractText(" ");
-                              parsedPubMedDoc.addAbstractText( stringBuilder.toString() );
-                          }
+                                    parsedPubMedDoc.addAbstractText(" ");
+                                    parsedPubMedDoc.addAbstractText(stringBuilder.toString());
+                                }
 
 
+                                continue;
 
-                            continue;
+                            }
+
 
                         }
-
 
                         //end of record, tidy upp!
                         if (isEnd && event.asEndElement().getName().getLocalPart().equals("PubmedArticle")) { // end of record
 
 
-                            if(parsedPubMedDoc.getPubyear() == 2009) {
+                            if( consideredYears.contains( parsedPubMedDoc.getPubyear() ) ) {
                                 parsedPubMedDoc.setInternalID(internalID);
                                 internalID++;
                                 persist.saveRecord(parsedPubMedDoc.getInternalID(), parsedPubMedDoc);
-                                docs2009++;
+                                docsForConsideredYears++;
                             }
 
                             break;
@@ -430,12 +435,12 @@ public class ReadXML {
 
             xmlReader.close();
             System.out.println("processed files: " + nrfiles);
-            System.out.println("number of 2009 records found so far: " + docs2009 + " total seen: " + docs);
+            System.out.println("number of considered records found so far: " + docsForConsideredYears + " total seen: " + docs);
             nrfiles++;
 
         } //loop over files done
 
-        System.out.println("number of records (year=2009) seen: " + docs2009);
+        System.out.println("number of records considered: " + docsForConsideredYears);
         System.out.println("total number of docs:" + docs);
 
        // System.out.println(parsedPubMedDocList.size());
