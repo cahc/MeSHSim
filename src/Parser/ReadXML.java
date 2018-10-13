@@ -8,6 +8,7 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.*;
+import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -29,12 +30,14 @@ public class ReadXML {
         boolean getAbstracts = false;
 
 
-        File f = new File("/Users/Cristian/Downloads/baseline"); // current directory
+        //File f = new File("/Users/Cristian/Downloads/baseline"); // current directory
+
+        File f = FileSystems.getDefault().getPath(".").toFile();
 
         FilenameFilter textFilter = new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
-                if (lowercaseName.endsWith(".gz") && lowercaseName.startsWith("pubmed")) {
+                if (lowercaseName.endsWith(".gz") && ( lowercaseName.startsWith("pubmed") || lowercaseName.startsWith("medline") )  ) {
                     return true;
                 } else {
                     return false;
@@ -55,7 +58,7 @@ public class ReadXML {
         int internalID = 1;
         //List<ParsedPubMedDoc> parsedPubMedDocList = new ArrayList<>(10000);
 
-        Persist persist = new Persist("pubmed2013-2017.db");
+        Persist persist = new Persist("medline2013-2017.db");
 
 
         for(File file : files) {

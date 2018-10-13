@@ -50,7 +50,8 @@ public class ICindexer {
             }
         }
 
-        Persist persist = new Persist("pubmed2009v3.db");
+        //Persist persist = new Persist("pubmed2009v3.db");
+        Persist persist = new Persist("medline2013-2017.db");
 
         Object2IntOpenHashMap<String> freqName = new Object2IntOpenHashMap<String>();
         Object2IntOpenHashMap<String> freqUI = new Object2IntOpenHashMap<String>();
@@ -291,13 +292,13 @@ public class ICindexer {
             MeshDescriptorCustom descriptor = descriptorsMap.get(targetID);
 
 
-            System.out.println(descriptor);
+            //System.out.println(descriptor);
 
             //(1) get numer of occurences for D007637 in db
 
             int freq = freqUI.getInt(targetID);
 
-            System.out.println("freq: " + freqUI.getInt(targetID));
+           // System.out.println("freq: " + freqUI.getInt(targetID));
 
             Set<TreeNodeMeSH> treeNumbers = descriptor.getTreeNodeSet();
 
@@ -309,10 +310,10 @@ public class ICindexer {
                 decendants.addAll(treeNodeMeSH.getAllDescendents());
             }
 
-            System.out.println("decendants:");
-            System.out.println(decendants);
+            //System.out.println("decendants:");
+            //System.out.println(decendants);
 
-            System.out.println("uniqe meshid on lower level");
+           // System.out.println("uniqe meshid on lower level");
 
             Set<String> UIs = new HashSet<>();
 
@@ -324,7 +325,7 @@ public class ICindexer {
             }
 
 
-            System.out.println("freq for descentants:");
+            //System.out.println("freq for descentants:");
 
             int freqDecendants = 0;
             for (String id : UIs) {
@@ -341,7 +342,7 @@ public class ICindexer {
 
             double ic = -(Math.log10(P) / normFactorToGetLog2);
 
-            System.out.println("P: " + P + " ICindexer: " + ic);
+          //  System.out.println("P: " + P + " ICindexer: " + ic);
 
 
             //collect to get overall freq, sum P sum to 1

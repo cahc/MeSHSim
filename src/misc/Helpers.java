@@ -210,12 +210,12 @@ public class Helpers {
 
     public static void main(String[] arg ) throws IOException {
 
-        SparseMatrix sparseMatrix = clutoKnngToSymetricUpperRight("/Users/Cristian/Desktop/NEW_DATA_BIBCAP_2017/PubMed/MeSHSimvectors/MeSHSimVectorsk25.clu");
+        SparseMatrix sparseMatrix = clutoKnngToSymetricUpperRight("/Users/Cristian/Desktop/NEW_DATA_BIBCAP_2017/PubMed/MeSHSimvectors/MeSHSimVectorsk25NOTSCALED.clu");
 
 
 
-      SparseMatrixToCluto(sparseMatrix,"/Users/Cristian/Desktop/NEW_DATA_BIBCAP_2017/PubMed/MeSHSimvectors/MeSHSimVectorsk25SymetricUpperRight.clu");
-      SparseMatrixToIJV(sparseMatrix,"/Users/Cristian/Desktop/NEW_DATA_BIBCAP_2017/PubMed/MeSHSimvectors/MeSHSimVectorsk25SymetricUpperRight.ijv","\t");
+      SparseMatrixToCluto(sparseMatrix,"/Users/Cristian/Desktop/NEW_DATA_BIBCAP_2017/PubMed/MeSHSimvectors/MeSHSimVectorsk25NOTSCALEDSymetricUpperRight.clu");
+      SparseMatrixToIJV(sparseMatrix,"/Users/Cristian/Desktop/NEW_DATA_BIBCAP_2017/PubMed/MeSHSimvectors/MeSHSimVectorsk25NOTSCALEDSymetricUpperRight.ijv","\t");
 
 
     }

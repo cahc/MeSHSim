@@ -95,18 +95,25 @@ public class Persist {
 
     public static void main(String arg[]) throws IOException {
 
-        Persist persist = new Persist("pubmed2009v3.db");
+        Persist persist = new Persist("medline2013-2017.db");
 
         System.out.println("Records in db:" + persist.dbSize() );
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter("pubmed2009Textv3.txt"));
+        //BufferedWriter writer = new BufferedWriter(new FileWriter("pubmed2009Textv3.txt"));
+        BufferedWriter writer = new BufferedWriter(new FileWriter("RecordIDs.txt"));
 
        for(Map.Entry<Integer,byte[]> entry : persist.getEntrySet()) {
 
           // System.out.println(persist.bytesToRecord( entry.getValue() ).getInternalID() );
 
-           writer.write(persist.bytesToRecord( entry.getValue() ).toString());
+           ParsedPubMedDoc record = persist.bytesToRecord( entry.getValue());
+
+           boolean hasMeSH = record.getMesh().size() > 0;
+
+           writer.write( record.getPmid() + "\t" + record.doi +"\t" + record.getJournal() +"\t" + record.pubyear +"\t" + hasMeSH );
            writer.newLine();
+           //writer.write(persist.bytesToRecord( entry.getValue() ).toString());
+           //writer.newLine();
        }
 
        writer.flush();
