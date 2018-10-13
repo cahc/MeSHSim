@@ -7,4 +7,7 @@ java -cp MeSHSim.jar Parser.ICindexer
 /TODO ignore check terms and implement major boost
 java -cp MeSHSim.jar Parser.GenerateMeshVectors
 
-./knng -k=25 -alpha=5 -enh=10 -scale -norm=2 -ftmRead=clu -ftmWrite=clu l2knn MeSHVectors.clu MeSHSimVectorsk25.clu
+
+//dont scale the MeSH vectors, IC is a global weight as is!!
+
+./knng -k=25 -alpha=5 -enh=10 -norm=2 -fmtRead=clu -fmtWrite=clu l2knn MeSHVectors.clu MeSHSimVectorsk25.clu
