@@ -110,7 +110,7 @@ public class Persist {
 
            boolean hasMeSH = record.getMesh().size() > 0;
 
-           writer.write( record.getPmid() + "\t" + record.doi +"\t" + record.getJournal() +"\t" + record.pubyear +"\t" + hasMeSH );
+           writer.write( record.getPmid() + "\t" + record.doi +"\t" + record.getJournal() +"\t" + record.pubyear +"\t" + record.publicationTypes +"\t" + hasMeSH );
            writer.newLine();
            //writer.write(persist.bytesToRecord( entry.getValue() ).toString());
            //writer.newLine();
