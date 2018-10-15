@@ -8,10 +8,12 @@ java -cp MeSHSim.jar Parser.ICindexer
 java -cp MeSHSim.jar Parser.GenerateMeshVectors
 
 
-//dont scale the MeSH vectors, IC is a global weight as is!!
-
-./knng -k=25 -alpha=5 -enh=10 -norm=2 -fmtRead=clu -fmtWrite=clu l2knn MeSHVectors.clu MeSHSimVectorsk25.clu
-
+//Per project
 
 java -cp MeSHSim.jar Parser.GenerateMeSHVectorsBigData medline2013-2017.db
 
+./knng -k=25 -alpha=5 -enh=10 -norm=2 -fmtRead=clu -fmtWrite=clu l2knn MeSHVectors.clu MeSHSimVectorsk25.clu
+
+java -cp MeSHSim.jar misc.Helpers TopK25Similarity.clu
+
+java -jar ModularityOptimizer.jar TopK25SimilaritySymUpperRight..ijv massiveClustering.txt 1 2.0 3 2 10 0 1

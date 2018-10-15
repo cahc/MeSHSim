@@ -74,9 +74,13 @@ public class Helpers {
         String line;
         int zeroBasedRow=0;
 
+        int emptyRows = 0;
+
         while( (line = reader.readLine()) != null ) {
 
           String[] clutoLine = line.trim().split(" ");
+
+          if(clutoLine.length < 2) emptyRows++;
 
           for(int i=0; i<clutoLine.length-1; i++) {
 
@@ -110,7 +114,7 @@ public class Helpers {
         reader.close();
 
        System.out.println(  "new nnz in symmetric upper right: " + sparseMatrix.nnz() ) ;
-
+       System.out.println("Empty rows: "+ emptyRows);
        return sparseMatrix;
     }
 
@@ -210,17 +214,23 @@ public class Helpers {
 
     public static void main(String[] arg ) throws IOException {
 
-        SparseMatrix sparseMatrix = clutoKnngToSymetricUpperRight("/Users/Cristian/Desktop/NEW_DATA_BIBCAP_2017/PubMed/MeSHSimvectors/MeSHSimVectorsk25NOTSCALED.clu");
+        if (arg.length != 1) {
+            System.out.println("Supply top-k cluto file");
+            System.exit(0);
+        }
+            //SparseMatrix sparseMatrix = clutoKnngToSymetricUpperRight("/Users/Cristian/Desktop/NEW_DATA_BIBCAP_2017/PubMed/MeSHSimvectors/MeSHSimVectorsk25NOTSCALED.clu");
+            //SparseMatrixToCluto(sparseMatrix,"/Users/Cristian/Desktop/NEW_DATA_BIBCAP_2017/PubMed/MeSHSimvectors/MeSHSimVectorsk25NOTSCALEDSymetricUpperRight.clu");
+            //SparseMatrixToIJV(sparseMatrix,"/Users/Cristian/Desktop/NEW_DATA_BIBCAP_2017/PubMed/MeSHSimvectors/MeSHSimVectorsk25NOTSCALEDSymetricUpperRight.ijv","\t");
+
+            String inputName = arg[0];
+            SparseMatrix sparseMatrix = clutoKnngToSymetricUpperRight(inputName);
+            String[] nameParts = inputName.split("\\.");
+
+            SparseMatrixToCluto(sparseMatrix, nameParts[0] + "SymUpperRight.clu");
+            SparseMatrixToIJV(sparseMatrix, nameParts[0] + "SymUpperRight.ijv", "\t");
 
 
-
-      SparseMatrixToCluto(sparseMatrix,"/Users/Cristian/Desktop/NEW_DATA_BIBCAP_2017/PubMed/MeSHSimvectors/MeSHSimVectorsk25NOTSCALEDSymetricUpperRight.clu");
-      SparseMatrixToIJV(sparseMatrix,"/Users/Cristian/Desktop/NEW_DATA_BIBCAP_2017/PubMed/MeSHSimvectors/MeSHSimVectorsk25NOTSCALEDSymetricUpperRight.ijv","\t");
-
-
-    }
-
-
+        }
     }
 
 
