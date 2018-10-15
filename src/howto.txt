@@ -16,4 +16,4 @@ java -cp MeSHSim.jar Parser.GenerateMeSHVectorsBigData medline2013-2017.db
 
 java -cp MeSHSim.jar misc.Helpers TopK25Similarity.clu
 
-java -jar ModularityOptimizer.jar TopK25SimilaritySymUpperRight..ijv massiveClustering.txt 1 2.0 3 2 10 0 1
+java -Xmx8G -jar ModularityOptimizer.jar TopK25SimilaritySymUpperRight.ijv massiveClustering.txt 1 2.0 3 2 10 0 1
