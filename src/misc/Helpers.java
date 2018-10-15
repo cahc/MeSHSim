@@ -118,6 +118,52 @@ public class Helpers {
        return sparseMatrix;
     }
 
+    public static SparseMatrix clutoToSparseMatrix(String fileName) throws IOException {
+
+        BufferedReader reader = new BufferedReader( new FileReader(new File(fileName)));
+        String[] headers = reader.readLine().trim().split(" ");
+        if(headers.length != 3) {System.out.println("wrong header in Cluto-file"); System.exit(1); }
+
+        System.out.println("Cluto meta data. rows: " + headers[0] + " cols: " + headers[1] + " nnz: " + headers[2]);
+
+        SparseMatrix sparseMatrix = new SparseMatrix(Integer.valueOf(headers[0]),Integer.valueOf(headers[1]),25);
+
+        String line;
+        int zeroBasedRow=0;
+
+        int emptyRows = 0;
+
+        while( (line = reader.readLine()) != null ) {
+
+            String[] clutoLine = line.trim().split(" ");
+
+            if(clutoLine.length < 2) emptyRows++;
+
+            for(int i=0; i<clutoLine.length-1; i++) {
+
+                int zeroBasedCol = Integer.valueOf( clutoLine[i] )-1;
+                double value = Double.valueOf(clutoLine[i+1]);
+                i++;
+
+                sparseMatrix.set(zeroBasedRow,zeroBasedCol,value); // set!!
+
+
+            } //row parsed
+
+            zeroBasedRow++;
+
+        } //cluto file complete
+
+        reader.close();
+
+        System.out.println( "nnz in sparse matrix: " + sparseMatrix.nnz() ) ;
+        System.out.println("Empty rows: "+ emptyRows);
+        return sparseMatrix;
+
+
+
+    }
+
 
     public static void SparseMatrixToCluto(SparseMatrix matrix, String filename) throws IOException {
 
