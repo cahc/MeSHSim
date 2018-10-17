@@ -44,17 +44,13 @@ public class QualityFunction {
 
        partitionReader.close();
 
-       IntOpenHashSet countUniqueClusters = new IntOpenHashSet();
 
-       for(int i : partition) {
+       int countMax = 0;
+       for(int i=0; i<partition.size(); i++) { int cluster = partition.getInt(i); if(cluster>countMax) countMax=cluster; }
 
-           countUniqueClusters.add(i);
-       }
-
-       numberOfClusters = countUniqueClusters.size();
-       countUniqueClusters.clear();
 
        numberOfPublications = partition.size();
+       numberOfClusters = (countMax+1); //assuming cluster ID starts at 0
 
        if(numberOfPublications != topKsimilarity.rows()) throw new IOException("partition - matrix mismatch");
 
@@ -127,7 +123,7 @@ public class QualityFunction {
                 int j = indexValue.getIndex();
                 int cluster_for_j = getClusterForPublication(j);
 
-                if(cluster_for_i == cluster_for_j) { Q = Q + indexValue.getValue(); numberOfPairsConsidered++; } //the similarity between i and j
+                if(cluster_for_i == cluster_for_j)  { Q = Q + indexValue.getValue(); numberOfPairsConsidered++; } //the similarity between i and j
 
             }
 
