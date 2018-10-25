@@ -4,9 +4,8 @@ import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.nustaq.serialization.FSTConfiguration;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -95,12 +94,20 @@ public class Persist {
 
     public static void main(String arg[]) throws IOException {
 
-        Persist persist = new Persist("medline2013-2017.db");
+       // Persist persist = new Persist("medline2013-2017.db");
+        Persist persist = new Persist("pubmed2009v3.db");
 
         System.out.println("Records in db:" + persist.dbSize() );
 
+        //just to get the pubs that are in both pubmed 2009 and bibcap
+
+
+
+
         //BufferedWriter writer = new BufferedWriter(new FileWriter("pubmed2009Textv3.txt"));
-        BufferedWriter writer = new BufferedWriter(new FileWriter("RecordIDs.txt"));
+        //BufferedWriter writer = new BufferedWriter(new FileWriter("RecordIDs.txt"));
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter("pmidToType.txt"));
 
        for(Map.Entry<Integer,byte[]> entry : persist.getEntrySet()) {
 
@@ -108,10 +115,14 @@ public class Persist {
 
            ParsedPubMedDoc record = persist.bytesToRecord( entry.getValue());
 
-           boolean hasMeSH = record.getMesh().size() > 0;
 
-           writer.write( record.getPmid() + "\t" + record.doi +"\t" + record.getJournal() +"\t" + record.pubyear +"\t" + record.publicationTypes +"\t" + hasMeSH );
+           writer.write(record.pmid +"\t" + record.publicationTypes);
            writer.newLine();
+
+           //boolean hasMeSH = record.getMesh().size() > 0;
+
+           //writer.write( record.getPmid() + "\t" + record.doi +"\t" + record.getJournal() +"\t" + record.pubyear +"\t" + record.publicationTypes +"\t" + hasMeSH );
+           //writer.newLine();
            //writer.write(persist.bytesToRecord( entry.getValue() ).toString());
            //writer.newLine();
        }
