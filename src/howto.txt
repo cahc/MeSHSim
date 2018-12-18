@@ -8,9 +8,28 @@ java -cp MeSHSim.jar Parser.ICindexer
 java -cp MeSHSim.jar Parser.GenerateMeshVectors
 
 
-//Per project
+//Per & Nees project
+
+(1)
+java -cp MeSHSim.jar Parser.ICindexer medline2013-2017.db
+
+java -cp MeSHSim.jar Parser.NeesSubset
+
+###
+
+Descriptor to IC mappings: 28313
+Descriptor to index mappings: 28313
+Qualifier to index mappings: 79
+Sparse vector length: 2265040
+# : 2941119
+
+
+###
+
 
 java -cp MeSHSim.jar Parser.GenerateMeSHVectorsBigData medline2013-2017.db
+
+
 
 ./knng -k=25 -alpha=5 -enh=10 -norm=2 -fmtRead=clu -fmtWrite=clu l2knn MeSHVectors.clu MeSHSimVectorsk25.clu
 

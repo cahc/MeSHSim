@@ -10,8 +10,6 @@
     <orderEntry type="library" name="it.unimi.dsi:fastutil:8.2.1" level="project" />
     <orderEntry type="library" name="com.h2database:h2:1.4.197" level="project" />
     <orderEntry type="library" name="BibCapResearch" level="project" />
-    <orderEntry type="library" name="lucene-core-7.4.0" level="application" />
-    <orderEntry type="library" name="lucene-queries-7.4.0" level="application" />
-    <orderEntry type="library" name="lucene-queryparser-7.4.0" level="application" />
+    <orderEntry type="library" name="lucene-core-7.4.0" level="project" />
   </component>
 </module>

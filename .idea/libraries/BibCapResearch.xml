@@ -8,7 +8,6 @@
     </JAVADOC>
     <SOURCES>
       <root url="jar://$PROJECT_DIR$/lib/BibCapResearch.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/BibCapResearch.jar!/" />
     </SOURCES>
   </library>
 </component>
