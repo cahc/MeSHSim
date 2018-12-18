@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import jsat.linear.SparseVector;
+import misc.Helpers;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -207,6 +208,10 @@ public class NeesSubset {
         CheckTags checkTags = new CheckTags();
         List<SparseVector> sparseVectorList = new ArrayList<>();
         //insertion order so we match Nees pub_ib
+
+        BufferedWriter pmidOrderWriter = new BufferedWriter( new FileWriter( new File("NeesMeSHPMIDorder.txt")));
+
+
         for(Integer pmid : PMIDs) {
 
         ParsedPubMedDoc record = persistSubset.retrieveRecord(pmid);
@@ -215,6 +220,7 @@ public class NeesSubset {
 
             List<ParsedMeSHDescriptor> meSHDescriptorList = record.getMesh();
             SparseVector sparseVector = new SparseVector(neesSubset.totalVectorLength,20);
+
 
 
 
@@ -255,13 +261,37 @@ public class NeesSubset {
 
 
             sparseVectorList.add(sparseVector);
-
-
+            pmidOrderWriter.write(String.valueOf(pmid));
+            pmidOrderWriter.newLine();
 
         }
 
+        pmidOrderWriter.flush();
+        pmidOrderWriter.close();
+
         persistSubset.close();
-       System.out.println("Vectors created: " + sparseVectorList.size());
+        System.out.println("Vectors created: " + sparseVectorList.size());
+
+
+        System.out.println("Saving to cluto file");
+
+        int nnz=0;
+        for(SparseVector d : sparseVectorList) nnz += d.nnz();
+
+        BufferedWriter clutoWriter = new BufferedWriter( new FileWriter( new File("NeesMeSH.clu")));
+
+        clutoWriter.write(sparseVectorList.size() +" " + neesSubset.totalVectorLength + " " + nnz);
+        clutoWriter.newLine();
+        for(SparseVector d : sparseVectorList) {
+
+            clutoWriter.write(Helpers.printSparseVectorOneBasedToCluto(d));
+            clutoWriter.newLine();
+        }
+
+        clutoWriter.flush();
+        clutoWriter.close();
+
+
 
     }
 

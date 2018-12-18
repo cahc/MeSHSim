@@ -27,6 +27,10 @@ Sparse vector length: 2265040
 ###
 
 
+./knng -k=20 -alpha=5 -enh=10 -norm=2 -fmtRead=clu -fmtWrite=clu l2knn MeSHVectors.clu MeSHSimVectorsk25.clu
+
+
+
 java -cp MeSHSim.jar Parser.GenerateMeSHVectorsBigData medline2013-2017.db
 
 
