@@ -144,7 +144,7 @@ public class ICindexer {
         }
 
         System.out.println("# names: " + freqName.size());
-        System.out.println("# ui: " + freqName.size());
+        System.out.println("# ui: " + freqUI.size());
 
         System.out.println("N: " + totalNumberOfTerms);
         System.out.println("N sanity check: " + totalNumberOfTermsCanityCheck);
@@ -167,7 +167,8 @@ public class ICindexer {
         for(Object2IntMap.Entry<String> entry : freqUI.object2IntEntrySet()) {
 
          //   writer2.write( entry.getKey() + "\t" + entry.getIntValue() );
-           // writer2.newLine();
+            //
+            //writer2.newLine();
 
         }
 
@@ -340,7 +341,7 @@ public class ICindexer {
 
             }
 
-            double P = (freq + freqDecendants) / (double) totalNumberOfTerms;
+            double P = (freq + freqDecendants) / (double) totalNumberOfTerms; //we dont use this, wrong and remove
 
             //double res = log10(n)/log10(2);
             double normFactorToGetLog2 = Math.log10(2);
